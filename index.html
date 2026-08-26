@@ -333,14 +333,14 @@
 
 
   /* ==========================================
-     ★ この2か所を変更してください
+     ★ この2か所を自分の値にしてください
      ========================================== */
 
   const SUPABASE_URL =
     "https://hhzbiiqxghzpeblmzuku.supabase.co";
 
   const SUPABASE_PUBLISHABLE_KEY =
-    "sb_publishable_BwQoZWVHG6EPWYiOtQORvQ_2Qw-rZq1";
+    "https://hhzbiiqxghzpeblmzuku.supabase.co/rest/v1/";
 
 
   /* ========================================== */
@@ -375,8 +375,8 @@
       now.getTime()
       - now.getTimezoneOffset() * 60000
     )
-    .toISOString()
-    .slice(0, 10);
+      .toISOString()
+      .slice(0, 10);
 
 
   dateInput.value = today;
@@ -399,25 +399,55 @@
   }
 
 
-  slotButtons.forEach((button) => {
+  function setClosedDayDisplay() {
 
-    button.addEventListener(
-      "click",
-      () => {
+    slotButtons.forEach(
+      (button) => {
 
-        if (!button.disabled) {
+        button.disabled = true;
 
-          button.classList.toggle(
-            "selected"
-          );
+        button.classList.remove(
+          "selected"
+        );
 
-        }
+        button
+          .querySelector(".remain")
+          .textContent =
+          "休業日";
 
       }
     );
 
-  });
 
+    statusBox.textContent =
+      "この日は休業日のためご予約いただけません。";
+
+    statusBox.className =
+      "error";
+
+  }
+
+
+  slotButtons.forEach(
+    (button) => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          if (!button.disabled) {
+
+            button.classList.toggle(
+              "selected"
+            );
+
+          }
+
+        }
+      );
+
+    }
+  );
 
 
   async function loadAvailability() {
@@ -443,13 +473,63 @@
     );
 
 
+    /*
+      まず休業日か確認
+    */
+
+    const {
+      data: isClosed,
+      error: closedError
+    } = await db.rpc(
+      "is_closed_day",
+      {
+        p_date:
+          dateInput.value
+      }
+    );
+
+
+    if (closedError) {
+
+      console.error(
+        closedError
+      );
+
+      showError(
+        "営業日情報を取得できませんでした：" +
+        closedError.message
+      );
+
+      return;
+
+    }
+
+
+    /*
+      休業日ならここで終了
+    */
+
+    if (isClosed) {
+
+      setClosedDayDisplay();
+
+      return;
+
+    }
+
+
+    /*
+      営業日なら通常の空席取得
+    */
+
     const {
       data,
       error
     } = await db.rpc(
       "get_availability",
       {
-        p_date: dateInput.value
+        p_date:
+          dateInput.value
       }
     );
 
@@ -459,8 +539,8 @@
       console.error(error);
 
       showError(
-        "空席情報を取得できませんでした："
-        + error.message
+        "空席情報を取得できませんでした：" +
+        error.message
       );
 
       return;
@@ -516,12 +596,10 @@
   }
 
 
-
   dateInput.addEventListener(
     "change",
     loadAvailability
   );
-
 
 
   bookBtn.addEventListener(
@@ -529,6 +607,44 @@
     async () => {
 
       clearStatus();
+
+
+      /*
+        予約ボタンを押した瞬間にも
+        もう一度休業日チェック
+      */
+
+      const {
+        data: isClosed,
+        error: closedError
+      } = await db.rpc(
+        "is_closed_day",
+        {
+          p_date:
+            dateInput.value
+        }
+      );
+
+
+      if (closedError) {
+
+        showError(
+          "営業日情報を確認できませんでした：" +
+          closedError.message
+        );
+
+        return;
+
+      }
+
+
+      if (isClosed) {
+
+        setClosedDayDisplay();
+
+        return;
+
+      }
 
 
       const slots =
@@ -601,7 +717,8 @@
       }
 
 
-      bookBtn.disabled = true;
+      bookBtn.disabled =
+        true;
 
       bookBtn.textContent =
         "予約処理中...";
@@ -633,7 +750,8 @@
       );
 
 
-      bookBtn.disabled = false;
+      bookBtn.disabled =
+        false;
 
       bookBtn.textContent =
         "予約する";
@@ -644,8 +762,8 @@
         console.error(error);
 
         showError(
-          "予約できませんでした："
-          + error.message
+          "予約できませんでした：" +
+          error.message
         );
 
         await loadAvailability();
@@ -722,7 +840,6 @@
 
     }
   );
-
 
 
   backBtn.addEventListener(

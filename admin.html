@@ -1,0 +1,817 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>BOOK & NIGHT｜予約管理</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #f4f0e8;
+      color: #302b25;
+      font-family: -apple-system, BlinkMacSystemFont,
+        "Yu Gothic", "Hiragino Kaku Gothic ProN",
+        Meiryo, sans-serif;
+    }
+
+    header {
+      background: #28231f;
+      color: white;
+      padding: 24px 6%;
+      font-family: Georgia, serif;
+      font-size: 24px;
+      letter-spacing: 0.08em;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    .panel {
+      background: #fffdf9;
+      padding: 28px;
+      border-radius: 12px;
+      border: 1px solid #ddd4c7;
+    }
+
+    #loginScreen {
+      max-width: 450px;
+      margin: 70px auto;
+    }
+
+    h1 {
+      font-weight: 400;
+      margin-top: 0;
+    }
+
+    #loginScreen h1 {
+      text-align: center;
+      font-family: Georgia, serif;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #777;
+      margin-bottom: 28px;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px;
+      margin-bottom: 12px;
+      border: 1px solid #cfc5b8;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    #loginBtn {
+      width: 100%;
+      padding: 14px;
+      background: #5e4935;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .top p {
+      margin: 0;
+      color: #777;
+    }
+
+    .small-btn {
+      padding: 10px 15px;
+      background: #eee8de;
+      border: 1px solid #cfc5b8;
+      border-radius: 6px;
+    }
+
+    h2 {
+      font-size: 18px;
+      margin-top: 30px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+    }
+
+    .stat {
+      padding: 20px;
+      background: #f7f2e9;
+      border-radius: 9px;
+    }
+
+    .stat span {
+      display: block;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 28px;
+      margin: 8px 0;
+    }
+
+    .stat small {
+      color: #777;
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 850px;
+    }
+
+    th,
+    td {
+      padding: 13px 10px;
+      border-bottom: 1px solid #e1d9ce;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    th {
+      color: #777;
+      font-weight: 400;
+    }
+
+    .cancel-btn {
+      padding: 7px 10px;
+      border: 1px solid #c9a9a3;
+      background: #fff;
+      border-radius: 5px;
+    }
+
+    .cancelled {
+      color: #999;
+    }
+
+    .error {
+      padding: 12px;
+      margin-top: 15px;
+      background: #f6e4e1;
+      border-radius: 6px;
+    }
+
+    .success {
+      padding: 12px;
+      margin-top: 15px;
+      background: #e9f0e4;
+      border-radius: 6px;
+    }
+
+    @media (max-width: 700px) {
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .top {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  BOOK & NIGHT
+</header>
+
+<main>
+
+  <section id="loginScreen" class="panel">
+
+    <h1>BOOK & NIGHT</h1>
+
+    <p class="subtitle">
+      管理者ログイン
+    </p>
+
+    <input
+      id="loginEmail"
+      type="email"
+      placeholder="メールアドレス"
+    >
+
+    <input
+      id="loginPassword"
+      type="password"
+      placeholder="パスワード"
+    >
+
+    <button id="loginBtn">
+      ログイン
+    </button>
+
+    <div id="loginStatus"></div>
+
+  </section>
+
+
+  <section id="adminScreen" class="hidden">
+
+    <div class="top">
+
+      <div>
+        <h1>予約管理</h1>
+        <p>BOOK & NIGHT</p>
+      </div>
+
+      <button
+        id="logoutBtn"
+        class="small-btn"
+      >
+        ログアウト
+      </button>
+
+    </div>
+
+
+    <div class="panel">
+
+      <h2>日付を選択</h2>
+
+      <input
+        id="adminDate"
+        type="date"
+      >
+
+
+      <h2>予約状況</h2>
+
+      <div class="stats">
+
+        <div class="stat">
+          <span>19:00〜20:00</span>
+          <strong id="stat19">- / 9</strong>
+          <small id="remain19">-</small>
+        </div>
+
+        <div class="stat">
+          <span>20:00〜21:00</span>
+          <strong id="stat20">- / 9</strong>
+          <small id="remain20">-</small>
+        </div>
+
+        <div class="stat">
+          <span>21:00〜22:00</span>
+          <strong id="stat21">- / 9</strong>
+          <small id="remain21">-</small>
+        </div>
+
+      </div>
+
+
+      <h2>予約一覧</h2>
+
+      <div id="adminStatus"></div>
+
+      <div class="table-wrap">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>時間</th>
+              <th>予約番号</th>
+              <th>お名前</th>
+              <th>メール</th>
+              <th>電話番号</th>
+              <th>状態</th>
+              <th></th>
+            </tr>
+          </thead>
+
+          <tbody id="reservationRows"></tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+<script type="module">
+
+  import {
+    createClient
+  } from
+    "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+
+  /* ==========================================
+     ★ この2か所を変更してください
+     ========================================== */
+
+  const SUPABASE_URL =
+    "https://hhzbiiqxghzpeblmzuku.supabase.co";
+
+  const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_BwQoZWVHG6EPWYiOtQORvQ_2Qw-rZq1";
+
+
+  /* ========================================== */
+
+
+  const db = createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+
+  const loginScreen =
+    document.getElementById("loginScreen");
+
+  const adminScreen =
+    document.getElementById("adminScreen");
+
+  const loginBtn =
+    document.getElementById("loginBtn");
+
+  const logoutBtn =
+    document.getElementById("logoutBtn");
+
+  const loginStatus =
+    document.getElementById("loginStatus");
+
+  const adminStatus =
+    document.getElementById("adminStatus");
+
+  const adminDate =
+    document.getElementById("adminDate");
+
+  const reservationRows =
+    document.getElementById("reservationRows");
+
+
+  const now = new Date();
+
+  const today =
+    new Date(
+      now.getTime()
+      - now.getTimezoneOffset() * 60000
+    )
+    .toISOString()
+    .slice(0, 10);
+
+  adminDate.value = today;
+
+
+  function updateStats(rows) {
+
+    const active =
+      rows.filter(
+        row =>
+          row.status === "confirmed"
+      );
+
+
+    const count19 =
+      active.filter(
+        row =>
+          row.time_slot ===
+          "19:00-20:00"
+      ).length;
+
+
+    const count20 =
+      active.filter(
+        row =>
+          row.time_slot ===
+          "20:00-21:00"
+      ).length;
+
+
+    const count21 =
+      active.filter(
+        row =>
+          row.time_slot ===
+          "21:00-22:00"
+      ).length;
+
+
+    document
+      .getElementById("stat19")
+      .textContent =
+      `${count19} / 9`;
+
+    document
+      .getElementById("remain19")
+      .textContent =
+      count19 >= 9
+        ? "満席"
+        : `残り${9 - count19}席`;
+
+
+    document
+      .getElementById("stat20")
+      .textContent =
+      `${count20} / 9`;
+
+    document
+      .getElementById("remain20")
+      .textContent =
+      count20 >= 9
+        ? "満席"
+        : `残り${9 - count20}席`;
+
+
+    document
+      .getElementById("stat21")
+      .textContent =
+      `${count21} / 9`;
+
+    document
+      .getElementById("remain21")
+      .textContent =
+      count21 >= 9
+        ? "満席"
+        : `残り${9 - count21}席`;
+
+  }
+
+
+  function displayRows(rows) {
+
+    reservationRows.innerHTML = "";
+
+
+    if (rows.length === 0) {
+
+      reservationRows.innerHTML = `
+        <tr>
+          <td colspan="7">
+            この日の予約はありません。
+          </td>
+        </tr>
+      `;
+
+      return;
+
+    }
+
+
+    rows.forEach((row) => {
+
+      const tr =
+        document.createElement("tr");
+
+
+      if (
+        row.status === "cancelled"
+      ) {
+
+        tr.classList.add(
+          "cancelled"
+        );
+
+      }
+
+
+      tr.innerHTML = `
+
+        <td>
+          ${row.time_slot.replace("-", "〜")}
+        </td>
+
+        <td>
+          ${row.reservation_number}
+        </td>
+
+        <td>
+          ${row.name}
+        </td>
+
+        <td>
+          ${row.email}
+        </td>
+
+        <td>
+          ${row.phone || "-"}
+        </td>
+
+        <td>
+          ${
+            row.status === "confirmed"
+              ? "予約済"
+              : "キャンセル"
+          }
+        </td>
+
+        <td>
+          ${
+            row.status === "confirmed"
+              ? `<button
+                   class="cancel-btn"
+                   data-id="${row.id}"
+                 >
+                   キャンセル
+                 </button>`
+              : ""
+          }
+        </td>
+
+      `;
+
+
+      reservationRows
+        .appendChild(tr);
+
+    });
+
+
+    document
+      .querySelectorAll(
+        ".cancel-btn"
+      )
+      .forEach((button) => {
+
+        button.addEventListener(
+          "click",
+          async () => {
+
+            const ok =
+              confirm(
+                "この予約をキャンセルしますか？"
+              );
+
+
+            if (!ok) {
+              return;
+            }
+
+
+            const {
+              error
+            } = await db.rpc(
+              "admin_cancel_reservation",
+              {
+                p_id:
+                  button.dataset.id
+              }
+            );
+
+
+            if (error) {
+
+              adminStatus.textContent =
+                "キャンセルできませんでした："
+                + error.message;
+
+              adminStatus.className =
+                "error";
+
+              return;
+
+            }
+
+
+            adminStatus.textContent =
+              "予約をキャンセルしました。";
+
+            adminStatus.className =
+              "success";
+
+
+            await loadReservations();
+
+          }
+        );
+
+      });
+
+  }
+
+
+  async function loadReservations() {
+
+    adminStatus.textContent = "";
+    adminStatus.className = "";
+
+
+    reservationRows.innerHTML = `
+      <tr>
+        <td colspan="7">
+          読み込み中...
+        </td>
+      </tr>
+    `;
+
+
+    const {
+      data,
+      error
+    } = await db.rpc(
+      "admin_get_reservations",
+      {
+        p_date:
+          adminDate.value
+      }
+    );
+
+
+    if (error) {
+
+      adminStatus.textContent =
+        "予約情報を取得できませんでした："
+        + error.message;
+
+      adminStatus.className =
+        "error";
+
+      return;
+
+    }
+
+
+    updateStats(data);
+
+    displayRows(data);
+
+  }
+
+
+  loginBtn.addEventListener(
+    "click",
+    async () => {
+
+      loginStatus.textContent = "";
+      loginStatus.className = "";
+
+
+      const email =
+        document
+          .getElementById(
+            "loginEmail"
+          )
+          .value
+          .trim();
+
+
+      const password =
+        document
+          .getElementById(
+            "loginPassword"
+          )
+          .value;
+
+
+      if (!email || !password) {
+
+        loginStatus.textContent =
+          "メールアドレスとパスワードを入力してください。";
+
+        loginStatus.className =
+          "error";
+
+        return;
+
+      }
+
+
+      loginBtn.disabled = true;
+      loginBtn.textContent =
+        "ログイン中...";
+
+
+      const {
+        error
+      } =
+        await db.auth
+          .signInWithPassword({
+            email,
+            password
+          });
+
+
+      loginBtn.disabled = false;
+      loginBtn.textContent =
+        "ログイン";
+
+
+      if (error) {
+
+        loginStatus.textContent =
+          "ログインできませんでした："
+          + error.message;
+
+        loginStatus.className =
+          "error";
+
+        return;
+
+      }
+
+
+      loginScreen
+        .classList
+        .add("hidden");
+
+
+      adminScreen
+        .classList
+        .remove("hidden");
+
+
+      await loadReservations();
+
+    }
+  );
+
+
+  logoutBtn.addEventListener(
+    "click",
+    async () => {
+
+      await db.auth.signOut();
+
+
+      adminScreen
+        .classList
+        .add("hidden");
+
+
+      loginScreen
+        .classList
+        .remove("hidden");
+
+
+      document
+        .getElementById(
+          "loginPassword"
+        )
+        .value = "";
+
+    }
+  );
+
+
+  adminDate.addEventListener(
+    "change",
+    loadReservations
+  );
+
+
+  const {
+    data: {
+      session
+    }
+  } =
+    await db.auth.getSession();
+
+
+  if (session) {
+
+    loginScreen
+      .classList
+      .add("hidden");
+
+
+    adminScreen
+      .classList
+      .remove("hidden");
+
+
+    await loadReservations();
+
+  }
+
+</script>
+
+</body>
+</html>

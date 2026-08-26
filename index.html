@@ -1,0 +1,743 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <title>BOOK & NIGHT｜夜のブックカフェ予約</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #f4f0e8;
+      color: #302b25;
+      font-family: -apple-system, BlinkMacSystemFont,
+        "Yu Gothic", "Hiragino Kaku Gothic ProN",
+        Meiryo, sans-serif;
+    }
+
+    header {
+      background: #28231f;
+      color: #ffffff;
+      padding: 24px 6%;
+      font-family: Georgia, serif;
+      font-size: 24px;
+      letter-spacing: 0.08em;
+    }
+
+    main {
+      max-width: 760px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .hero h1 {
+      font-family: Georgia, serif;
+      font-weight: 400;
+      font-size: 36px;
+      margin: 8px;
+    }
+
+    .hero p {
+      color: #756e65;
+    }
+
+    .card {
+      background: #fffdf9;
+      padding: 28px;
+      border-radius: 12px;
+      border: 1px solid #ddd4c7;
+      box-shadow: 0 8px 25px rgba(74, 57, 36, 0.08);
+    }
+
+    h2 {
+      font-size: 18px;
+      margin-top: 28px;
+    }
+
+    h2:first-child {
+      margin-top: 0;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px;
+      margin-bottom: 12px;
+      border: 1px solid #cfc5b8;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    .notice {
+      font-size: 13px;
+      background: #f3eadb;
+      padding: 12px;
+      border-left: 3px solid #9a774e;
+      margin: 15px 0;
+    }
+
+    .slots {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .slot {
+      padding: 18px 10px;
+      background: #ffffff;
+      border: 1px solid #cfc5b8;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    .slot.selected {
+      border: 2px solid #5e4935;
+      background: #f1e8dc;
+    }
+
+    .slot:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .remain {
+      display: block;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+
+    #bookBtn,
+    #backBtn {
+      width: 100%;
+      margin-top: 20px;
+      padding: 15px;
+      border: 0;
+      border-radius: 6px;
+      background: #5e4935;
+      color: #ffffff;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #bookBtn:disabled {
+      opacity: 0.55;
+    }
+
+    #status {
+      margin-top: 15px;
+    }
+
+    .error {
+      padding: 12px;
+      background: #f6e4e1;
+      border-radius: 6px;
+    }
+
+    .complete {
+      display: none;
+      text-align: center;
+      background: #fffdf9;
+      padding: 30px;
+      border: 1px solid #ddd4c7;
+      border-radius: 12px;
+    }
+
+    .summary {
+      text-align: left;
+      background: #f6f1e8;
+      padding: 18px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 650px) {
+      .slots {
+        grid-template-columns: 1fr;
+      }
+
+      .hero h1 {
+        font-size: 29px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  BOOK & NIGHT
+</header>
+
+<main>
+
+  <section id="booking">
+
+    <div class="hero">
+      <div>夜のブックカフェ</div>
+
+      <h1>
+        静かな夜の席を予約する
+      </h1>
+
+      <p>
+        19:00〜22:00 ／ 1時間単位 ／ 1予約1席 ／ 現地決済
+      </p>
+    </div>
+
+
+    <div class="card">
+
+      <h2>
+        1. 日付を選ぶ
+      </h2>
+
+      <input
+        id="date"
+        type="date"
+      >
+
+
+      <h2>
+        2. 時間枠を選ぶ
+      </h2>
+
+      <div class="notice">
+        2時間ご利用の場合は、
+        連続する2つの時間枠を選択してください。
+      </div>
+
+
+      <div class="slots">
+
+        <button
+          class="slot"
+          data-slot="19:00-20:00"
+        >
+          19:00〜20:00
+
+          <span class="remain">
+            確認中...
+          </span>
+        </button>
+
+
+        <button
+          class="slot"
+          data-slot="20:00-21:00"
+        >
+          20:00〜21:00
+
+          <span class="remain">
+            確認中...
+          </span>
+        </button>
+
+
+        <button
+          class="slot"
+          data-slot="21:00-22:00"
+        >
+          21:00〜22:00
+
+          <span class="remain">
+            確認中...
+          </span>
+        </button>
+
+      </div>
+
+
+      <h2>
+        3. 予約者情報
+      </h2>
+
+      <input
+        id="name"
+        type="text"
+        autocomplete="name"
+        placeholder="お名前"
+      >
+
+      <input
+        id="email"
+        type="email"
+        autocomplete="email"
+        placeholder="メールアドレス"
+      >
+
+      <input
+        id="phone"
+        type="tel"
+        autocomplete="tel"
+        placeholder="電話番号"
+      >
+
+
+      <div id="status"></div>
+
+
+      <button id="bookBtn">
+        予約する
+      </button>
+
+    </div>
+
+  </section>
+
+
+
+  <section
+    id="complete"
+    class="complete"
+  >
+
+    <h1>
+      ご予約ありがとうございます
+    </h1>
+
+    <p>
+      ご予約を受け付けました。
+    </p>
+
+    <div
+      id="summary"
+      class="summary"
+    ></div>
+
+    <button id="backBtn">
+      別の予約をする
+    </button>
+
+  </section>
+
+</main>
+
+
+
+<script type="module">
+
+  import {
+    createClient
+  } from
+    "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+
+  /* ==========================================
+     ★ この2か所を変更してください
+     ========================================== */
+
+  const SUPABASE_URL =
+    "https://hhzbiiqxghzpeblmzuku.supabase.co";
+
+  const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_BwQoZWVHG6EPWYiOtQORvQ_2Qw-rZq1";
+
+
+  /* ========================================== */
+
+
+  const db = createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+
+  const dateInput =
+    document.getElementById("date");
+
+  const slotButtons =
+    [...document.querySelectorAll(".slot")];
+
+  const statusBox =
+    document.getElementById("status");
+
+  const bookBtn =
+    document.getElementById("bookBtn");
+
+  const backBtn =
+    document.getElementById("backBtn");
+
+
+  const now = new Date();
+
+  const today =
+    new Date(
+      now.getTime()
+      - now.getTimezoneOffset() * 60000
+    )
+    .toISOString()
+    .slice(0, 10);
+
+
+  dateInput.value = today;
+  dateInput.min = today;
+
+
+  function showError(message) {
+
+    statusBox.textContent = message;
+    statusBox.className = "error";
+
+  }
+
+
+  function clearStatus() {
+
+    statusBox.textContent = "";
+    statusBox.className = "";
+
+  }
+
+
+  slotButtons.forEach((button) => {
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        if (!button.disabled) {
+
+          button.classList.toggle(
+            "selected"
+          );
+
+        }
+
+      }
+    );
+
+  });
+
+
+
+  async function loadAvailability() {
+
+    clearStatus();
+
+
+    slotButtons.forEach(
+      (button) => {
+
+        button.disabled = true;
+
+        button.classList.remove(
+          "selected"
+        );
+
+        button
+          .querySelector(".remain")
+          .textContent =
+          "確認中...";
+
+      }
+    );
+
+
+    const {
+      data,
+      error
+    } = await db.rpc(
+      "get_availability",
+      {
+        p_date: dateInput.value
+      }
+    );
+
+
+    if (error) {
+
+      console.error(error);
+
+      showError(
+        "空席情報を取得できませんでした："
+        + error.message
+      );
+
+      return;
+
+    }
+
+
+    const map =
+      Object.fromEntries(
+        data.map(
+          (item) => [
+            item.time_slot,
+            item
+          ]
+        )
+      );
+
+
+    slotButtons.forEach(
+      (button) => {
+
+        const item =
+          map[
+            button.dataset.slot
+          ];
+
+
+        if (!item) {
+          return;
+        }
+
+
+        const remaining =
+          Number(
+            item.remaining
+          );
+
+
+        button.disabled =
+          remaining <= 0;
+
+
+        button
+          .querySelector(".remain")
+          .textContent =
+          remaining <= 0
+            ? "満席"
+            : `残り ${remaining}席`;
+
+      }
+    );
+
+  }
+
+
+
+  dateInput.addEventListener(
+    "change",
+    loadAvailability
+  );
+
+
+
+  bookBtn.addEventListener(
+    "click",
+    async () => {
+
+      clearStatus();
+
+
+      const slots =
+        slotButtons
+          .filter(
+            (button) =>
+              button.classList.contains(
+                "selected"
+              )
+          )
+          .map(
+            (button) =>
+              button.dataset.slot
+          );
+
+
+      const name =
+        document
+          .getElementById("name")
+          .value
+          .trim();
+
+
+      const email =
+        document
+          .getElementById("email")
+          .value
+          .trim();
+
+
+      const phone =
+        document
+          .getElementById("phone")
+          .value
+          .trim();
+
+
+      if (
+        slots.length === 0
+      ) {
+
+        showError(
+          "時間枠を選択してください。"
+        );
+
+        return;
+
+      }
+
+
+      if (!name) {
+
+        showError(
+          "お名前を入力してください。"
+        );
+
+        return;
+
+      }
+
+
+      if (!email) {
+
+        showError(
+          "メールアドレスを入力してください。"
+        );
+
+        return;
+
+      }
+
+
+      bookBtn.disabled = true;
+
+      bookBtn.textContent =
+        "予約処理中...";
+
+
+      const {
+        data,
+        error
+      } = await db.rpc(
+        "book_reservation",
+        {
+
+          p_date:
+            dateInput.value,
+
+          p_time_slots:
+            slots,
+
+          p_name:
+            name,
+
+          p_email:
+            email,
+
+          p_phone:
+            phone
+
+        }
+      );
+
+
+      bookBtn.disabled = false;
+
+      bookBtn.textContent =
+        "予約する";
+
+
+      if (error) {
+
+        console.error(error);
+
+        showError(
+          "予約できませんでした："
+          + error.message
+        );
+
+        await loadAvailability();
+
+        return;
+
+      }
+
+
+      const reservationNumbers =
+        data
+          .map(
+            (item) =>
+              item.reservation_number
+          )
+          .join(" / ");
+
+
+      const times =
+        data
+          .map(
+            (item) =>
+              item.booked_time_slot
+                .replace(
+                  "-",
+                  "〜"
+                )
+          )
+          .join("、");
+
+
+      document
+        .getElementById("booking")
+        .style.display =
+        "none";
+
+
+      document
+        .getElementById("complete")
+        .style.display =
+        "block";
+
+
+      document
+        .getElementById("summary")
+        .innerHTML = `
+
+          <p>
+            <strong>予約番号：</strong>
+            ${reservationNumbers}
+          </p>
+
+          <p>
+            <strong>日付：</strong>
+            ${dateInput.value}
+          </p>
+
+          <p>
+            <strong>時間：</strong>
+            ${times}
+          </p>
+
+          <p>
+            <strong>お名前：</strong>
+            ${name}
+          </p>
+
+          <p>
+            <strong>お支払い：</strong>
+            現地決済
+          </p>
+
+        `;
+
+    }
+  );
+
+
+
+  backBtn.addEventListener(
+    "click",
+    () => {
+
+      location.reload();
+
+    }
+  );
+
+
+  await loadAvailability();
+
+</script>
+
+</body>
+</html>

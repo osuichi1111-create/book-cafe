@@ -266,7 +266,17 @@
         id="adminDate"
         type="date"
       >
+<div style="display:flex; gap:10px; margin-top:10px;">
+  <button id="closeDayBtn" class="small-btn">
+    この日を休業日にする
+  </button>
 
+  <button id="openDayBtn" class="small-btn">
+    休業日を解除
+  </button>
+</div>
+
+<div id="closedDayStatus"></div>
 
       <h2>予約状況</h2>
 
@@ -781,10 +791,13 @@
   );
 
 
-  adminDate.addEventListener(
-    "change",
-    loadReservations
-  );
+adminDate.addEventListener(
+  "change",
+  async () => {
+    await loadReservations();
+    await refreshClosedDayStatus();
+  }
+);
 
 
   const {
@@ -808,7 +821,7 @@
 
 
     await loadReservations();
-
+　　await refreshClosedDayStatus();
   }
 
 </script>

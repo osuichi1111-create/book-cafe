@@ -274,18 +274,24 @@
 
       if (error) {
 
-        confirmArea.classList.add(
-          "hidden"
-        );
+  console.error(
+    "キャンセルエラー",
+    error
+  );
 
-        showMessage(
-          "予約をキャンセルできませんでした。すでにキャンセル済みの可能性があります。",
-          "error"
-        );
+  confirmArea.classList.add(
+    "hidden"
+  );
 
-        return;
+  showMessage(
+    "予約をキャンセルできませんでした：" +
+    error.message,
+    "error"
+  );
 
-      }
+  return;
+
+}
 
 
       confirmArea.classList.add(

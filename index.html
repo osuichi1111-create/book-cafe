@@ -759,7 +759,40 @@
                 )
           )
           .join("、");
+try {
 
+  const { error: mailError } =
+    await db.functions.invoke(
+      "send-reservation-email",
+      {
+        body: {
+          email: email,
+          name: name,
+          reservationNumber:
+            reservationNumbers,
+          reservationDate:
+            dateInput.dataset.value,
+          reservationTime:
+            times
+        }
+      }
+    );
+
+  if (mailError) {
+    console.error(
+      "メール送信エラー",
+      mailError
+    );
+  }
+
+} catch (mailError) {
+
+  console.error(
+    "メール送信エラー",
+    mailError
+  );
+
+}
 
       document
         .getElementById("booking")

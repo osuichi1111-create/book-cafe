@@ -760,6 +760,12 @@
                 )
           )
           .join("、");
+      const cancelTokens =
+  data
+    .map(
+      item =>
+        item.cancel_token
+    );
 try {
 
   const { error: mailError } =
@@ -767,15 +773,17 @@ try {
       "send-reservation-email",
       {
         body: {
-          email: email,
-          name: name,
-          reservationNumber:
-            reservationNumbers,
-          reservationDate:
-            dateInput.dataset.value,
-          reservationTime:
-            times
-        }
+  email: email,
+  name: name,
+  reservationNumber:
+    reservationNumbers,
+  reservationDate:
+    dateInput.dataset.value,
+  reservationTime:
+    times,
+  cancelTokens:
+    cancelTokens
+}
       }
     );
 

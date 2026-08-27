@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <title>BOOK BAR 川べり｜予約キャンセル</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #f4f0e8;
+      color: #302b25;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Yu Gothic",
+        "Hiragino Kaku Gothic ProN",
+        Meiryo,
+        sans-serif;
+    }
+
+    header {
+      background: #28231f;
+      color: #fff;
+      padding: 24px 6%;
+      font-family: Georgia, serif;
+      font-size: 24px;
+      letter-spacing: 0.08em;
+    }
+
+    main {
+      max-width: 650px;
+      margin: 50px auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: #fffdf9;
+      padding: 30px;
+      border: 1px solid #ddd4c7;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    h1 {
+      font-weight: 400;
+      margin-top: 0;
+    }
+
+    p {
+      line-height: 1.8;
+    }
+
+    .cancel-btn {
+      width: 100%;
+      margin-top: 20px;
+      padding: 15px;
+      border: 0;
+      border-radius: 6px;
+      background: #8a3f36;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .cancel-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .back-btn {
+      width: 100%;
+      margin-top: 12px;
+      padding: 15px;
+      border: 1px solid #cfc5b8;
+      border-radius: 6px;
+      background: #eee8de;
+      color: #302b25;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .message {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    .success {
+      background: #e9f0e4;
+    }
+
+    .error {
+      background: #f6e4e1;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  BOOK BAR 川べり
+</header>
+
+<main>
+
+  <div class="card">
+
+    <div id="confirmArea">
+
+      <h1>
+        予約をキャンセルしますか？
+      </h1>
+
+      <p>
+        キャンセルすると、この予約枠は再び予約可能になります。
+      </p>
+
+      <p>
+        この操作は元に戻せません。
+      </p>
+
+      <button
+        id="cancelBtn"
+        class="cancel-btn"
+      >
+        予約をキャンセルする
+      </button>
+
+    </div>
+
+    <div
+      id="message"
+      class="message hidden"
+    ></div>
+
+    <button
+      id="backBtn"
+      class="back-btn"
+    >
+      予約ページへ戻る
+    </button>
+
+  </div>
+
+</main>
+
+
+<script type="module">
+
+  import {
+    createClient
+  } from
+    "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+
+  /* ==========================================
+     ★ index.html と同じ値を入れてください
+     ========================================== */
+
+  const SUPABASE_URL =
+    "https://hhzbiiqxghzpeblmzuku.supabase.co";
+
+  const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_BwQoZWVHG6EPWYiOtQORvQ_2Qw-rZq1";
+
+
+  /* ========================================== */
+
+
+  const db = createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+
+  const cancelBtn =
+    document.getElementById("cancelBtn");
+
+  const messageBox =
+    document.getElementById("message");
+
+  const confirmArea =
+    document.getElementById("confirmArea");
+
+  const backBtn =
+    document.getElementById("backBtn");
+
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  const token =
+    params.get("token");
+
+
+  function showMessage(
+    text,
+    type
+  ) {
+
+    messageBox.textContent =
+      text;
+
+    messageBox.className =
+      `message ${type}`;
+
+  }
+
+
+  if (!token) {
+
+    confirmArea.classList.add(
+      "hidden"
+    );
+
+    showMessage(
+      "キャンセル情報が確認できませんでした。",
+      "error"
+    );
+
+  }
+
+
+  cancelBtn.addEventListener(
+    "click",
+    async () => {
+
+      if (!token) {
+        return;
+      }
+
+
+      const ok =
+        confirm(
+          "本当にこの予約をキャンセルしますか？"
+        );
+
+
+      if (!ok) {
+        return;
+      }
+
+
+      cancelBtn.disabled =
+        true;
+
+      cancelBtn.textContent =
+        "キャンセル処理中...";
+
+
+      const {
+        data,
+        error
+      } = await db.rpc(
+        "cancel_reservation_by_token",
+        {
+          p_token:
+            token
+        }
+      );
+
+
+      if (error) {
+
+        confirmArea.classList.add(
+          "hidden"
+        );
+
+        showMessage(
+          "予約をキャンセルできませんでした。すでにキャンセル済みの可能性があります。",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      confirmArea.classList.add(
+        "hidden"
+      );
+
+
+      const reservation =
+        data && data.length > 0
+          ? data[0]
+          : null;
+
+
+      if (reservation) {
+
+        showMessage(
+          `予約番号 ${reservation.reservation_number} をキャンセルしました。`,
+          "success"
+        );
+
+      } else {
+
+        showMessage(
+          "予約をキャンセルしました。",
+          "success"
+        );
+
+      }
+
+    }
+  );
+
+
+  backBtn.addEventListener(
+    "click",
+    () => {
+
+      window.location.href =
+        "./";
+
+    }
+  );
+
+</script>
+
+</body>
+</html>

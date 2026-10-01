@@ -508,37 +508,7 @@
   }
 
 
-openDayBtn.addEventListener(
-  "click",
-  async () => {
 
-    const ok = confirm(
-      adminDate.value +
-      " の営業日を解除しますか？"
-    );
-
-    if (!ok) return;
-
-    const { error } = await db.rpc(
-      "admin_set_closed_day",
-      {
-        p_date: adminDate.value,
-        p_closed: false
-      }
-    );
-
-    if (error) {
-      closedDayStatus.textContent =
-        "営業日を解除できませんでした：" +
-        error.message;
-
-      closedDayStatus.className = "error";
-      return;
-    }
-
-    await refreshClosedDayStatus();
-  }
-);
 
 
   bookBtn.addEventListener(

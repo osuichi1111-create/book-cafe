@@ -508,96 +508,37 @@
   }
 
 
-  async function setupCalendar() {
+openDayBtn.addEventListener(
+  "click",
+  async () => {
 
-    const today =
-      new Date();
-
-    const from =
-      today.toISOString()
-        .slice(0, 10);
-
-
-    const future =
-      new Date();
-
-    future.setFullYear(
-      future.getFullYear() + 1
+    const ok = confirm(
+      adminDate.value +
+      " の営業日を解除しますか？"
     );
 
-    const to =
-      future.toISOString()
-        .slice(0, 10);
+    if (!ok) return;
 
-
-    const {
-      data,
-      error
-    } = await db.rpc(
-      "get_closed_days",
+    const { error } = await db.rpc(
+      "admin_set_closed_day",
       {
-        p_from: from,
-        p_to: to
+        p_date: adminDate.value,
+        p_closed: false
       }
     );
-
 
     if (error) {
+      closedDayStatus.textContent =
+        "営業日を解除できませんでした：" +
+        error.message;
 
-      showError(
-        "休業日情報を取得できませんでした：" +
-        error.message
-      );
-
+      closedDayStatus.className = "error";
       return;
-
     }
 
-
-    const closedDays =
-      data.map(
-        item => item.closed_date
-      );
-
-
-    flatpickr(
-      dateInput,
-      {
-
-        locale: flatpickr.l10ns.ja,
-
-        dateFormat:
-          "Y-m-d",
-
-        minDate:
-          "today",
-
-        disable:
-          closedDays,
-
-        defaultDate:
-          null,
-
-        onChange:
-          function(
-            selectedDates,
-            dateStr
-          ) {
-
-            dateInput.dataset.value =
-              dateStr;
-
-            loadAvailability();
-
-          }
-
-      }
-    );
-
-
-    disableSlots();
-
+    await refreshClosedDayStatus();
   }
+);
 
 
   bookBtn.addEventListener(

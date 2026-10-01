@@ -507,7 +507,118 @@
 
   }
 
+async function setupCalendar() {
 
+  let openDays = [];
+
+  const calendar = flatpickr(
+    dateInput,
+    {
+      locale: flatpickr.l10ns.ja,
+
+      dateFormat: "Y-m-d",
+
+      minDate: "today",
+
+      disable: [
+        function(date) {
+
+          const year =
+            date.getFullYear();
+
+          const month =
+            String(
+              date.getMonth() + 1
+            ).padStart(2, "0");
+
+          const day =
+            String(
+              date.getDate()
+            ).padStart(2, "0");
+
+          const ymd =
+            year + "-" +
+            month + "-" +
+            day;
+
+          return !openDays.includes(ymd);
+        }
+      ],
+
+      defaultDate: null,
+
+      onChange:
+        function(
+          selectedDates,
+          dateStr
+        ) {
+
+          dateInput.dataset.value =
+            dateStr;
+
+          loadAvailability();
+
+        }
+    }
+  );
+
+
+  disableSlots();
+
+
+  const today =
+    new Date();
+
+  const from =
+    today.toISOString()
+      .slice(0, 10);
+
+
+  const future =
+    new Date();
+
+  future.setFullYear(
+    future.getFullYear() + 1
+  );
+
+
+  const to =
+    future.toISOString()
+      .slice(0, 10);
+
+
+  const {
+    data,
+    error
+  } = await db.rpc(
+    "get_closed_days",
+    {
+      p_from: from,
+      p_to: to
+    }
+  );
+
+
+  if (error) {
+
+    showError(
+      "営業日情報を取得できませんでした：" +
+      error.message
+    );
+
+    return;
+  }
+
+
+  openDays =
+    (data || []).map(
+      item => item.closed_date
+    );
+
+
+  calendar.redraw();
+
+}
 
 
 

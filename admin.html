@@ -681,7 +681,7 @@ closeDayBtn.addEventListener(
 
     const ok = confirm(
       adminDate.value +
-      " を休業日に設定しますか？"
+      " を営業日にしますか？"
     );
 
     if (!ok) return;
@@ -696,7 +696,7 @@ closeDayBtn.addEventListener(
 
     if (error) {
       closedDayStatus.textContent =
-        "休業日に設定できませんでした：" +
+        "営業日に設定できませんでした：" +
         error.message;
 
       closedDayStatus.className = "error";
@@ -714,7 +714,7 @@ openDayBtn.addEventListener(
 
     const ok = confirm(
       adminDate.value +
-      " の休業日を解除しますか？"
+      " の営業日を解除しますか？"
     );
 
     if (!ok) return;
@@ -729,7 +729,7 @@ openDayBtn.addEventListener(
 
     if (error) {
       closedDayStatus.textContent =
-        "休業日を解除できませんでした：" +
+        "営業日を解除できませんでした：" +
         error.message;
 
       closedDayStatus.className = "error";

@@ -645,7 +645,7 @@ async function refreshClosedDayStatus() {
 
   if (error) {
     closedDayStatus.textContent =
-      "休業日情報を取得できませんでした：" +
+      "営業日情報を取得できませんでした：" +
       error.message;
 
     closedDayStatus.className = "error";
@@ -653,22 +653,24 @@ async function refreshClosedDayStatus() {
   }
 
   if (data) {
+
     closedDayStatus.textContent =
-      "この日は休業日に設定されています。";
-
-    closedDayStatus.className = "success";
-
-    closeDayBtn.disabled = true;
-    openDayBtn.disabled = false;
-
-  } else {
-    closedDayStatus.textContent =
-      "この日は営業日です。";
+      "この日は休業日です。";
 
     closedDayStatus.className = "";
 
     closeDayBtn.disabled = false;
     openDayBtn.disabled = true;
+
+  } else {
+
+    closedDayStatus.textContent =
+      "この日は営業日に設定されています。";
+
+    closedDayStatus.className = "success";
+
+    closeDayBtn.disabled = true;
+    openDayBtn.disabled = false;
   }
 }
 
